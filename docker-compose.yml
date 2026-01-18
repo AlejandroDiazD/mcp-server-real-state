@@ -1,0 +1,18 @@
+#docker-compose.yml
+services:
+  mcp-server:
+    build: .
+    container_name: mcp-challenge
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - APP_NAME="Real Estate MCP Server"
+      - APP_API_TOKEN=secret_token_2026
+      - DATABASE_URL=sqlite:///./data/real_estate.db
+      - HOST=0.0.0.0
+      - PORT=8000
+      - FASTMCP_DEBUG=false
+      - FASTMCP_LOG_LEVEL=INFO
