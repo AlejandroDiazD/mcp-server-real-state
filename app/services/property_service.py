@@ -69,11 +69,8 @@ class PropertyService:
                 features=features
             )
             db.add(new_prop)
-            db.commit()
-            db.refresh(new_prop)
             return new_prop
         except Exception as e:
-            db.rollback()
             raise e
 
     @staticmethod
@@ -91,10 +88,8 @@ class PropertyService:
                 return False
                 
             db.delete(prop)
-            db.commit()
             return True
         except Exception as e:
-            db.rollback()
             raise e
         
     @staticmethod
@@ -122,11 +117,8 @@ class PropertyService:
                 if value is not None:
                     setattr(prop, key, value)
 
-            db.commit()
-            db.refresh(prop)
             return prop
         except Exception as e:
-            db.rollback()
             raise e
 
     @staticmethod
@@ -141,6 +133,5 @@ class PropertyService:
                 Property(id="prop_003", city="Sevilla", price=180000, rooms=2, status="available", description="Classic house in Santa Cruz", features="")
             ]
             db.add_all(samples)
-            db.commit()
             return True
         return False

@@ -1,6 +1,6 @@
 # server/tools.py
 import asyncio
-from infra.database import SessionLocal
+from infra.database import get_db_session
 from services.property_service import PropertyService
 from services.content_service import ContentGeneratorService
 
@@ -19,7 +19,7 @@ def register_tools(mcp):
         """Search for properties with filters."""
         # Using to_thread to keep the event loop non-blocking
         def sync_search():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 props = PropertyService.search_properties(
                     db, city, min_price, max_price, status)
                 return ContentGeneratorService.format_property_list(props)
@@ -30,7 +30,7 @@ def register_tools(mcp):
     async def get_property_details(property_id: str) -> dict:
         """Retrieves full technical details for a specific property ID."""
         def sync_get():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 p = PropertyService.get_by_id(db, property_id)
                 return ContentGeneratorService.format_property_detail(p)
             
@@ -44,7 +44,7 @@ def register_tools(mcp):
     ) -> str:
         """Generates SEO-optimized HTML listing content."""
         def sync_gen():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 p = PropertyService.get_by_id(db, property_id)
                 return ContentGeneratorService.generate_listing_content(
                             p, target_language, tone)
@@ -63,7 +63,7 @@ def register_tools(mcp):
     ) -> dict:
         """Adds a new property. Status should be 'available' or 'sold'."""
         def sync_add():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 try:
                     new_prop = PropertyService.create_property(
                         db, property_id, city, price, rooms, status, description, features
@@ -86,7 +86,7 @@ def register_tools(mcp):
         Permanently removes a property from the catalog by its ID.
         """
         def sync_delete():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 try:
                     success = PropertyService.delete_property(db, property_id)
                     if success:
@@ -121,7 +121,7 @@ def register_tools(mcp):
         Only provide the fields that need to be changed.
         """
         def sync_update():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 try:
                     update_data = {
                         "city": city,
@@ -160,7 +160,7 @@ def register_tools(mcp):
     async def seed_data() -> dict:
         """Seed the database with samples."""
         def sync_seed():
-            with SessionLocal() as db:
+            with get_db_session() as db:
                 try:
                     success = PropertyService.create_sample_data(db)
                     if success:
