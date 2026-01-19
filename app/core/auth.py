@@ -10,8 +10,6 @@ class StaticTokenVerifier(TokenVerifier):
     """
     async def verify_token(self, token: str) -> AccessToken | None:
         clean_token = token.replace("Bearer ", "").replace("bearer ", "").strip()
-        print(f">>> Clean token: {clean_token}")
-        print(f"settings.API_TOKEN: {settings.API_TOKEN}")
         if clean_token == settings.API_TOKEN:
             return AccessToken(
                 token=clean_token,
