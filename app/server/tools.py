@@ -20,9 +20,15 @@ def register_tools(mcp):
         # Using to_thread to keep the event loop non-blocking
         def sync_search():
             with get_db_session() as db:
-                props = PropertyService.search_properties(
-                    db, city, min_price, max_price, status)
-                return ContentGeneratorService.format_property_list(props)
+                try:
+                    props = PropertyService.search_properties(
+                        db, city, min_price, max_price, status)
+                    return ContentGeneratorService.format_property_list(props)
+                except Exception as e:
+                    return ContentGeneratorService.format_action_result(
+                        success=False,
+                        message=f"Could not search properties: {str(e)}"
+                    )
         
         return await asyncio.to_thread(sync_search)
     
@@ -31,8 +37,14 @@ def register_tools(mcp):
         """Retrieves full technical details for a specific property ID."""
         def sync_get():
             with get_db_session() as db:
-                p = PropertyService.get_by_id(db, property_id)
-                return ContentGeneratorService.format_property_detail(p)
+                try:
+                    p = PropertyService.get_by_id(db, property_id)
+                    return ContentGeneratorService.format_property_detail(p)
+                except Exception as e:
+                    return ContentGeneratorService.format_action_result(
+                        success=False,
+                        message=f"Could not get property details: {str(e)}"
+                    )
             
         return await asyncio.to_thread(sync_get)
     
@@ -45,9 +57,15 @@ def register_tools(mcp):
         """Generates SEO-optimized HTML listing content."""
         def sync_gen():
             with get_db_session() as db:
-                p = PropertyService.get_by_id(db, property_id)
-                return ContentGeneratorService.generate_listing_content(
-                            p, target_language, tone)
+                try:
+                    p = PropertyService.get_by_id(db, property_id)
+                    return ContentGeneratorService.generate_listing_content(
+                                p, target_language, tone)
+                except Exception as e:
+                    return ContentGeneratorService.format_action_result(
+                        success=False,
+                        message=f"Could not generate listing content: {str(e)}"
+                    )
         
         return await asyncio.to_thread(sync_gen)
 
@@ -74,9 +92,9 @@ def register_tools(mcp):
                     )
                 except Exception as e:
                         return ContentGeneratorService.format_action_result(
-                        success=False,
-                        message=f"Could not create property: {str(e)}"
-                    )
+                            success=False,
+                            message=f"Could not create property: {str(e)}"
+                        )
         
         return await asyncio.to_thread(sync_add)
 
@@ -95,14 +113,14 @@ def register_tools(mcp):
                             message=f"Property {property_id} deleted"
                         )
                     return ContentGeneratorService.format_action_result(
-                            success=False,
-                            message=f"Property {property_id} not found"
-                        )
+                        success=False,
+                        message=f"Property {property_id} not found"
+                    )
                 except Exception as e:
                     return ContentGeneratorService.format_action_result(
-                            success=False,
-                            message=f"Could not delete property: {str(e)}"
-                        )
+                        success=False,
+                        message=f"Could not delete property: {str(e)}"
+                    )
         
         return await asyncio.to_thread(sync_delete)
     
